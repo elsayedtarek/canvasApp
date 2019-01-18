@@ -1,0 +1,224 @@
+<html>
+    <head>
+        <title> Lab </title>
+        <style>
+            /* css style*/
+            *{margin: 0;padding: 0}
+            #toolBar
+            {
+                position: fixed;
+                top: 0;
+                background-color: black;
+                color: white;
+                display: -webkit-box;
+                padding: 0 10;
+                -webkit-box-align:center;
+                user-select: none;
+            }
+            #raduis
+            {
+                width: 400px;
+                font-size: 20px;
+                padding: 5px;
+            }
+           .incredecre, #raduis_value,#savbtn
+            {
+                margin-left: 5px;
+                border-radius: 50%;
+                padding:5px 7px;
+                box-shadow:red 10px 10px 10px inset,yellow -10px -10px 10px inset; 
+            }
+            .incredecre:hover,#savbtn:hover
+            {
+                cursor: pointer;
+                box-shadow:yellow 10px 10px 10px inset,red -10px -10px 10px inset; 
+            }
+            #save_bar
+            {
+                margin-left: 20px;
+                width: 500px;
+               font-size: 20px; 
+
+            }
+            #color_bar
+            {
+                width: 400px;
+                padding: 5px;
+                display: -webkit-box;
+                -webkit-box-align:center;
+            }
+            .active
+            {
+                border: 3px solid white;
+            }
+            .colors
+            {
+                width: 30px;
+                height: 50px;
+                margin-left : 6px;
+                border-radius:50%; 
+            }
+        </style>
+        <script>
+            //script code
+            window.addEventListener("load",doitfirst);
+            function doitfirst()
+            {
+                mycanvas=document.getElementById("My_canvas");
+                context=mycanvas.getContext("2d");
+                mycanvas.width=window.innerWidth;
+                mycanvas.height=window.innerHeight;
+                incre=document.getElementById("incre");
+                decre=document.getElementById("decre");
+                raduis_value=document.getElementById("raduis_value");
+                incre.addEventListener("click",increase);
+                decre.addEventListener("click",decrease);
+                isdrawable=false;
+                mycanvas.addEventListener("mousedown",downmouse_enable);
+                mycanvas.addEventListener("mouseup",upmouse_disalble);
+                mycanvas.addEventListener("mousemove",drowcircle);
+                raduis=10;
+                colors_item=document.querySelectorAll(".colors");
+                color_con=document.getElementById("color_bar");
+                savebtn=document.getElementById("savbtn");
+                savebtn.addEventListener("click",savedraw);
+                selected=document.getElementById("shap");
+                 for(i=0;i<colors_item.length;i++)
+                 {
+                    colors_item[i].addEventListener("click",changeColor)
+                    if(colors_item[i].style.backgroundColor==localStorage.getItem("oldcolor"))
+                    {
+                          context.fillStyle=localStorage.getItem("oldcolor");
+                    }
+                 }
+            //     allcolors=["red","blue","green","aqua","yellow","magenta","brown","coral","indianred"];
+            //     for(i=0;i<allcolors.length;i++)
+            //     {
+            //         var create_div=document.createElement("div");
+            //         create_div.className="colors";
+            //         create_div.addEventListener("click",changeColor);
+            //         create_div.style.backgroundColor=allcolors[i];
+            //         color_con.appendChild(create_div);
+            //         if(localStorage.getItem("oldcolor")==allcolors[i])
+            //         {
+            //             create_div.className+=" active";
+            //             context.fillStyle=allcolors[i];
+            //         }
+                   
+            //     }
+
+             }
+            function savedraw()
+            {
+                  uri= mycanvas.toDataURL("image/jpeg");
+                  name="myimage";
+                 var myimage = new Image();
+             //   myimage.src=mycanvas.toDataURL("image/jpeg");
+               // window.open("myimage, d_blank"); 
+                var link = document.createElement("a");
+                link.download = name;
+                link.href = uri;
+                window.open("myimage.jpg");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                delete link;
+                      
+            }
+            function changeColor(data)
+            {
+                newbtn=data.target;
+                oldbtn=document.getElementsByClassName("active")[0];
+                oldbtn.className="colors";
+                newbtn.className+=" active";
+                context.fillStyle=newbtn.style.backgroundColor;   
+                localStorage.setItem("oldcolor",newbtn.style.backgroundColor);
+            }
+            function increase()
+            {
+                raduis++;
+               //raduis_value.innerText=raduis;
+               checkes();
+            }
+            function decrease()
+            {
+                raduis--;
+               //raduis_value.innerText=raduis;
+                checkes();
+            }
+            function checkes()
+            {
+                if(raduis>100)
+                {
+                    raduis=100;
+                }
+                else if(raduis<10)
+                {
+                    raduis=10;
+                }
+                raduis_value.innerText=raduis;
+            }
+            function downmouse_enable()
+            {
+                isdrawable=true;   
+            }
+            function upmouse_disalble()
+            {
+                isdrawable=false;   
+            }
+            function drowcircle(event)
+            {
+                if(isdrawable)
+                {
+                   context.beginPath();
+                    if(selected[0].selected)
+                    {
+                   context.arc(event.clientX,event.clientY,raduis,0,2*Math.PI);
+                   context.fill();
+                    }
+                    else 
+                    {
+                        context.fillRect(event.clientX,event.clientY,100,100);
+                        context.fill(); 
+                    }
+                   //context.endPath();
+                }
+            }
+
+        </script>
+    </head>
+    <body>
+      
+        <div id="toolBar">
+            <div id="raduis">
+                <Label>Raduis</Label>
+                <span id="raduis_value">10</span>
+                <span class="incredecre" id="incre">+</span>
+                <span class="incredecre" id="decre">-</span>
+            </div>
+            <div id="save_bar">
+             <span id="savbtn">Save</span>
+            </div>
+             <div id="selected">
+                 <select id="shap">
+                     <option value="circle">circle
+                     <option value="rect">rectangle
+                 </select>
+            </div>
+            <div id="color_bar">
+                 <div class="active colors" style="background-color:red"></div>
+                <div class="colors" style="background-color:blue"></div>
+                <div class="colors" style="background-color:green"></div>
+                <div class="colors" style="background-color:aqua"></div>
+                <div class="colors" style="background-color:yellow"></div>
+                <div class="colors" style="background-color:magenta"></div>
+                <div class="colors" style="background-color:brown"></div>
+                <div class="colors" style="background-color:coral"></div>
+                <div class="colors" style="background-color:indianred"></div> 
+            </div>
+        </div>
+          <canvas id="My_canvas"></canvas>
+   
+
+    </body>
+</html>
